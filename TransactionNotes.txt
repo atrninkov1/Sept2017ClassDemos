@@ -1,0 +1,9 @@
+1 Make sure the <DBName>.Data library has Entity framework nuGetPackage
+2 entity folder fk add newItem
+3 Data / Datamodel
+4 Choose Db
+5 check connectionString
+6 pick tables
+7 move context to DAL
+8 change context namespace
+9 add using <DBName>.Data.Entities

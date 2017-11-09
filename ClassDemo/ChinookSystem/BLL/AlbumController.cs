@@ -82,7 +82,7 @@ namespace ChinookSystem.BLL
             using (var context = new ChinookContext())
             {
                 item = context.Albums.Add(item); //staging 
-                context.SaveChanges();          // commit of the request
+                context.SaveChanges();          // commit of the request (commit transaction)
                 return item.AlbumId;
             }
         }
@@ -114,6 +114,22 @@ namespace ChinookSystem.BLL
         public int Albums_Delete(Album item)
         {
             return Albums_Delete(item.AlbumId);
+        }
+
+        [DataObjectMethod(DataObjectMethodType.Select, false)]
+        public List<SelectionList> List_AlbumTitles()
+        {
+            using (var context = new ChinookContext())
+            {
+                var results = from x in context.Albums
+                              orderby x.Title
+                              select new SelectionList
+                              {
+                                  IDValueField = x.AlbumId,
+                                  DisplayText = x.Title
+                              };
+                return results.ToList();
+            }
         }
     }
 }
