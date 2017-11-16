@@ -60,8 +60,8 @@ namespace ChinookSystem.BLL
                 //Part One:
                 //query to get the playlist id
                 var exists = (from x in context.Playlists
-                               where x.UserName.Equals(username) && x.Name == playlistname
-                               select x).FirstOrDefault();
+                              where x.UserName.Equals(username) && x.Name == playlistname
+                              select x).FirstOrDefault();
                 //initialize the track number
                 int trackNumber = 0;
                 //Playlist track instance needed
@@ -100,15 +100,84 @@ namespace ChinookSystem.BLL
                 exists.PlaylistTracks.Add(newTrack);
                 // physically add all data to database commit
                 context.SaveChanges();
-                return List_TracksForPlaylist(playlistname,username);
+                return List_TracksForPlaylist(playlistname, username);
             }
         }//eom
         public void MoveTrack(string username, string playlistname, int trackid, int tracknumber, string direction)
         {
             using (var context = new ChinookContext())
             {
-                //code to go here 
-
+                var exists = (from x in context.Playlists
+                              where x.UserName.Equals(username) && x.Name == playlistname
+                              select x).FirstOrDefault();
+                if (exists != null)
+                {
+                    PlaylistTrack track = exists.PlaylistTracks.Where(x => x.TrackId == trackid).Select(x => x).FirstOrDefault();
+                    if (track == null)
+                    {
+                        throw new Exception("Playlist track has been removed from the file.");
+                    }
+                    else
+                    {
+                        PlaylistTrack otherTrack = null;
+                        if (direction.Equals("up"))
+                        {
+                            if (track.TrackNumber == 1)
+                            {
+                                throw new Exception("Playlist track already at top");
+                            }
+                            else
+                            {
+                                otherTrack = exists.PlaylistTracks.Where(x => x.TrackNumber == track.TrackNumber - 1).Select(x => x).FirstOrDefault();
+                                if (otherTrack == null)
+                                {
+                                    throw new Exception("Playlist track has been removed from the file.");
+                                }
+                                else
+                                {
+                                    track.TrackNumber--;
+                                    otherTrack.TrackNumber++;
+                                }
+                            }
+                            //staging
+                            context.Entry(track).Property(y => y.TrackNumber).IsModified = true;
+                            context.Entry(otherTrack).Property(y => y.TrackNumber).IsModified = true;
+                            //saving
+                            context.SaveChanges();
+                        }
+                        else if (direction.Equals("down"))
+                        {
+                            if (track.TrackNumber == exists.PlaylistTracks.Count)
+                            {
+                                throw new Exception("Playlist track already at bottom");
+                            }
+                            else
+                            {
+                                otherTrack = exists.PlaylistTracks.Where(x => x.TrackNumber == track.TrackNumber + 1).Select(x => x).FirstOrDefault();
+                                if (otherTrack == null)
+                                {
+                                    throw new Exception("Playlist track has been removed from the file.");
+                                }
+                                else
+                                {
+                                    track.TrackNumber++;
+                                    otherTrack.TrackNumber--;
+                                }
+                            }
+                            //staging
+                            context.Entry(track).Property(y => y.TrackNumber).IsModified = true;
+                            context.Entry(otherTrack).Property(y => y.TrackNumber).IsModified = true;
+                            //saving
+                            context.SaveChanges();
+                        }
+                        
+                    }
+                }
+                else
+                {
+                    throw new Exception("Playlist has been removed from the file");
+                }
+                
             }
         }//eom
 
@@ -117,9 +186,15 @@ namespace ChinookSystem.BLL
         {
             using (var context = new ChinookContext())
             {
-                //code to go here
-
-
+                var exists = (from x in context.Playlists
+                              where x.UserName.Equals(username) && x.Name == playlistname
+                              select x).FirstOrDefault();
+                for (int i = 0; i < trackstodelete.Count; i++)
+                {
+                    exists.PlaylistTracks.Remove(exists.PlaylistTracks.Where(x => x.TrackId == trackstodelete[i]).Select(x => x).FirstOrDefault());
+                }
+                //saving
+                context.SaveChanges();
             }
         }//eom
     }
