@@ -1,0 +1,30 @@
+Control panel
+Programs and features
+fund microsoft VS 2015
+double click
+modify
+Windows and Web Development
+	Microsoft SQL Server Data Tools
+	Microsoft Web developer Tools
+
+
+
+-------------------------
+Step 1: Linq query
+Exposed
+Creates a flat data collection POCO
+do not bother with sorting
+[POCOObjectMethod]
+public List<POCO>
+Step2: Create the report wizard
+via report wizard
+series of dialogues which you will use to supply information
+the wizard will generate your basic report
+.rdlc file
+XML file
+work in the wizard design
+uses layout of POCO
+Step3: webpage
+ODS
+ReportViewer
+configure the ReportViewer to a .rdlc and the ODS
